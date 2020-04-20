@@ -1,0 +1,202 @@
+---
+title: "Data Quality RCG Sub-Group Task 1 and 2"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Aims
+
+1. Compile table 5A in the national work plans for all the MS in the region and evaluate the overall documentation on quality of sampling programmes in the region using table 5A.
+2. Develop indicators to monitor overall progress (based on table 5A) on quality assurance in the region over time.
+
+## Methodology
+
+
+Table 5A from the Annual Reports of each MS were collated (the original annual reports can be downloaded from <https://datacollection.jrc.ec.europa.eu/wp-np-ar>).  Data quality indicators were then defined by considering the columns of the table.  For each row of the table these indicators were assigned a score from 1 - 4 (with 1 being worst and 4 being the best) - the scores were determined using the criteria in the table below.  NAs can also be a valid value for some of these indicators.  Sub-group members then evaluated each row in Table 5A for each MS which attends either the RCG BS, NA, or NS.  Since this was the first time this analysis has been attempted there was an iterative character to this process and the indicator definitions were revised as questions and issues were identified.  The mean of these indicators for different groupings (e.g. for all MS) was then calculated to produce the charts in this report.
+
+The aim of these indicators is not to rank the performance of MS against each other but to track how each MS is improving its data quality procedures.  An added benefit will be to demonstrate to MS which information it is useful to provide when completing Table 5A.
+
+The analysis has been performed in 2019 and 2020 using the most recent DCF reports available.
+
+
+```{r step_0, include=FALSE}
+# STEP 0) Preparation
+
+# This R markdown script will read in the indicators from a consolidated Table5A and then display the data.
+
+# install these packages if you need to
+#install.packages("readxl")
+#install.packages("dplyr")
+#install.packages("fmsb")
+
+# clear everything out of the environment
+rm(list = ls())
+
+# required libraries
+library(readxl)
+library(dplyr)
+library(fmsb)
+library(knitr)
+
+source("myFunctions.R")
+
+```
+
+```{r step_1, include=FALSE}
+
+# STEP 1) Read the data from the Excel spreadsheet
+
+# 2019 data 
+final_data_2019 <- readAndCleanData(spreadsheetName = 'Table5A_withIndicators_2019.xlsx',yearCalculated = 2019)
+
+final_data_2020 <- readAndCleanData(spreadsheetName = 'Table5A_withIndicators_2020.xlsx',yearCalculated = 2020)
+
+
+```
+
+
+
+
+```{r step_method, echo=FALSE}
+ind_define <- readIndicatorDefinitions(spreadsheetName = 'Table5A_withIndicators_2020.xlsx')
+
+#View(ind_define)
+options(knitr.kable.NA = '-')
+kable(ind_define,caption = "Indicator definitions")
+
+```
+
+## Results
+
+### Overall mean of the indicators for all MS
+
+
+```{r step_3, echo=FALSE}
+
+# STEP 3) Overall mean indicators
+
+MeanTotal_2019 <- calculateMeanForAllMS(dataToUse = final_data_2019)
+MeanTotal_2020 <- calculateMeanForAllMS(dataToUse = final_data_2020)
+
+# Need to combine the data frames in this way to preserve the row names (these specify the year)
+MeanTotal <- rBindRetainRownames(list(a=MeanTotal_2019, b=MeanTotal_2020))
+
+
+# Plot the data
+# Used this order for columns so that the indicators will read in a clockwise direction
+data_to_plot<-MeanTotal[,c(1,6:2)]
+MyPlot(to_plot=data_to_plot,title="Overall mean for all MS")
+
+options(knitr.kable.NA = 'NA')
+#kable(MeanTotal[,],caption = "Mean for all MS")
+kable(round(MeanTotal[,],digits=2),caption = "Mean for all MS")
+
+
+```
+
+### Mean indicators for each MS
+
+```{r step_4_a, include=FALSE}
+
+# STEP 4) Mean indicators by member states
+
+
+MeanByMS_2019 <- calculateMeanByMS(dataToUse = final_data_2019)
+MeanByMS_2020 <- calculateMeanByMS(dataToUse = final_data_2020)
+
+MeanByMS <- rBindRetainRownames(list(a=MeanByMS_2019, b=MeanByMS_2020))
+
+
+
+```
+
+
+
+```{r step_5, echo=FALSE}
+
+# STEP 5) Mean indicators for each member state
+
+# I just used a for-loop here - I'm sure there's a better way of doing this using the "apply" family of functions
+op <- par(mar=c(1, 2, 2, 1),mfrow=c(2, 2))
+
+#for(MSname in rownames(MeanByMS)){
+for(MSname in unique(MeanByMS$MS)){
+  #data_to_plot<-MeanByMS[MSname,c(2,7,6,5,4,3)]
+  data_to_plot <- MeanByMS[MeanByMS$MS==MSname,]
+  rownames(data_to_plot) <- data_to_plot$YearCalculated
+  data_to_plot<-data_to_plot[,c("SamplingDesign","EditImpute","AccuracyBias","DataStorage","DataCapture","NonResponse")]
+  
+  MyPlot(to_plot=data_to_plot,title=MSname, include_legend = TRUE)
+}
+
+par(op)
+
+options(knitr.kable.NA = 'NA')
+#kable(MeanByMS[,],caption = "Mean by Member State")
+kable(round(MeanByMS[,c("SamplingDesign","NonResponse","DataCapture","DataStorage","AccuracyBias","EditImpute")],digits=2),caption = "Mean by Member State")
+
+```
+
+### Mean indicators by RCG
+
+
+
+```{r step_6, echo=FALSE}
+
+# STEP 6) Mean indicators by RCG
+
+MeanByRegion_2019 <- calculateMeanByRegion(dataToUse = final_data_2019)
+MeanByRegion_2020 <- calculateMeanByRegion(dataToUse = final_data_2020)
+
+MeanByRegion <- rBindRetainRownames(list(a=MeanByRegion_2019, b=MeanByRegion_2020))
+
+
+op <- par(mar=c(1, 2, 2, 1),mfrow=c(2, 2))
+
+for(regionName in unique(MeanByRegion$Region)){
+
+  data_to_plot <- MeanByRegion[MeanByRegion$Region==regionName,]
+  rownames(data_to_plot) <- data_to_plot$YearCalculated
+  data_to_plot<-data_to_plot[,c("SamplingDesign","EditImpute","AccuracyBias","DataStorage","DataCapture","NonResponse")]
+  
+  MyPlot(to_plot=data_to_plot,title=regionName, include_legend = TRUE)
+}
+
+par(op)
+
+
+#rownames(regionalSummary) <- colnames(final_data_2019)[c(10,11,12,13,14,15,16)]
+#kable(regionalSummary,caption = "Regional Summary")
+kable(round(MeanByRegion[,c("SamplingDesign","NonResponse","DataCapture","DataStorage","AccuracyBias","EditImpute")],digits=2),caption = "Regional Summary")
+
+
+```
+
+
+
+## Appendix 1: Data Checks
+
+The following tables check for the following potential errors:
+1) Rows which include values other than "1","2","3" or "4" for their indicators.
+2) LDF, LP, Rec. or Diad. rows which also have other regions marked
+
+```{r step_show_problems, echo=FALSE}
+
+kable(check1234(final_data_2019),caption = '2019 entries which do not have a value of 1,2,3, or 4 for the indicators')
+
+kable(check1234(final_data_2020),caption = '2020 entries which do not have a value of 1,2,3, or 4 for the indicators')
+
+kable(checkRegions(final_data_2019),caption = '2019 LDF, LP, Rec. or Diad. entries which also have other regions marked')
+
+kable(checkRegions(final_data_2020),caption = '2020 LDF, LP, Rec. or Diad. entries which also have other regions marked')
+
+```
+
