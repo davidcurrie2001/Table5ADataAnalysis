@@ -30,7 +30,6 @@ ReadIndicatorData <- function(spreadsheetName, countryName){
   #countryName <- 'Spain'
   #spreadsheetName <- 'Table5A_withIndicators_2020.xlsx'
   
-  #my_data <- read_excel(spreadsheetName, sheet = 'Belgium') # Belgium
   my_data <- read_excel(spreadsheetName, sheet = countryName)
   
   # These are the columns we are interested in
@@ -41,38 +40,45 @@ ReadIndicatorData <- function(spreadsheetName, countryName){
   #UsualColNames <-colnames(my_data9)[positions]
   UsualColNames <- c("Table 5A: Quality assurance framework for biological data","...6","...20","...21","...22","...23","...24","...25","...26","...27","...28","...29","...30","...31","...32")   
   
-  
-  
-  if (countryName == "Estonia"){
+
+  #if (  countryName == "Estonia"){
+  if (grepl("Estonia", countryName, fixed=TRUE)){
     
     # Different column names used for Estonia - need to fix first before binding with the other data
     my_data <- select(my_data,positions)
     colnames(my_data)<-UsualColNames
-  } else if (countryName == "Finland"){
+  
+    #} else if (countryName == "Finland"){
+  } else if (grepl("Finland", countryName, fixed=TRUE)){
     
     # Different column positions used for Finland - need to fix first before binding with the other data
     #finData <- select(my_data11,c(1,25:30))
     my_data <- select(my_data,c(1,6,25:37))
     colnames(my_data)<-UsualColNames
     
-  } else if (countryName == "Lithuania"){
+  #} else if (countryName == "Lithuania"){
+  } else if (grepl("Lithuania", countryName, fixed=TRUE)){
     
     # Different column names used for Lithuania - need to fix first before binding with the other data
     my_data <- select(my_data,positions)
     colnames(my_data)<-UsualColNames
-  } else if (countryName == "Ireland"){
+    
+  #} else if (countryName == "Ireland"){
+  } else if (grepl("Ireland", countryName, fixed=TRUE)){
     
     # Different column names used for Ireland - need to fix first before binding with the other data
     my_data <- select(my_data,positions)
     colnames(my_data)<-UsualColNames
     
-  } else if (countryName == "Portugal"){
+  #} else if (countryName == "Portugal"){
+  } else if (grepl("Portugal", countryName, fixed=TRUE)){
     
     # Differet column names used for Portugal - need to fix first before binding with the other data
     my_data <- select(my_data,positions)
     colnames(my_data)<-UsualColNames
     
-  } else if (countryName == "Spain"){
+  #} else if (countryName == "Spain"){
+  } else if (grepl("Spain", countryName, fixed=TRUE)){
     
     # Spain has some records with country as "ES" rather then "ESP" - fix this
     #espData <- my_data26
@@ -96,117 +102,31 @@ readAndCleanData <- function(spreadsheetName, yearCalculated){
   
   #spreadsheetName <- 'Table5A_withIndicators_2020.xlsx'
   #yearCalculated <- 2020
-  
-  # my_data1 <- read_excel(spreadsheetName, sheet = 'Indicators') # Results
-  # my_data2 <- read_excel(spreadsheetName, sheet = 'IndicatorDefinition') # Definition
-  # #my_data3 <- read_excel(spreadsheetName, sheet = 'ReadMe') # Readme
-  # #my_data4 <- read_excel(spreadsheetName, sheet = 'Austria') #Austria
-  # my_data5 <- read_excel(spreadsheetName, sheet = 'Belgium') # Belgium
-  # #my_data6 <- read_excel(spreadsheetName, sheet = 'Bulgaria') # Bulgaria
-  # #my_data7 <- read_excel(spreadsheetName, sheet = 'Croatia') # Croatia
-  # #my_data8 <- read_excel(spreadsheetName, sheet = 'Cyprus') #Cyprus
-  # my_data9 <- read_excel(spreadsheetName, sheet = 'Denmark') # Denmark
-  # my_data10 <- read_excel(spreadsheetName, sheet = 'Estonia') # Estonia
-  # my_data11 <- read_excel(spreadsheetName, sheet = 'Finland') # Finland
-  # my_data12 <- read_excel(spreadsheetName, sheet = 'France') # France
-  # my_data13 <- read_excel(spreadsheetName, sheet = 'Germany') # Germany
-  # #my_data14 <- read_excel(spreadsheetName, sheet = 'Greece') # Greece
-  # #my_data15 <- read_excel(spreadsheetName, sheet = 'Hungary') # Hungary
-  # my_data16 <- read_excel(spreadsheetName, sheet = 'Ireland') # Ireland
-  # #my_data17 <- read_excel(spreadsheetName, sheet = 'Italy') # Italy
-  # my_data18 <- read_excel(spreadsheetName, sheet = 'Latvia') # Latvia
-  # my_data19 <- read_excel(spreadsheetName, sheet = 'Lithuania') # Lithuania
-  # #my_data20 <- read_excel(spreadsheetName, sheet = 'Malta') # Malta
-  # my_data21 <- read_excel(spreadsheetName, sheet = 'Netherlands') # Netherlands
-  # my_data22 <- read_excel(spreadsheetName, sheet = 'Poland') # Poland
-  # my_data23 <- read_excel(spreadsheetName, sheet = 'Portugal') # Portugal
-  # #my_data24 <- read_excel(spreadsheetName, sheet = 'Romania') # Romania
-  # #my_data25 <- read_excel(spreadsheetName, sheet = 'Slovenia') # Slovenia
-  # my_data26 <- read_excel(spreadsheetName, sheet = 'Spain') # Spain
-  # my_data27 <- read_excel(spreadsheetName, sheet = 'Sweden') # Sweden
-  # my_data28 <- read_excel(spreadsheetName, sheet = 'UK') #UK
-  # 
-  # # STEP 2) Join the data for the countries together and do some tidying up
-  # 
-  # # These are the columns we are interested in
-  # #positions <- c(1,20:25)
-  # positions <- c(1,6,20:32)
-  # 
-  # #"Normal" column names - sometimes these are different for specific countries
-  # UsualColNames <-colnames(my_data9)[positions]
-  # #print(UsualColNames)
-  # 
-  # # Different column names used for Estonia - need to fix first before binding with the other data
-  # estData <- select(my_data10,positions)
-  # colnames(estData)<-UsualColNames
-  # 
-  # # Different column positions used for Finland - need to fix first before binding with the other data
-  # #finData <- select(my_data11,c(1,25:30))
-  # finData <- select(my_data11,c(1,6,25:37))
-  # colnames(finData)<-UsualColNames
-  # 
-  # # Different column names used for Lithuania - need to fix first before binding with the other data
-  # ltuData <- select(my_data19,positions)
-  # colnames(ltuData)<-UsualColNames
-  # 
-  # # Different column names used for Ireland - need to fix first before binding with the other data
-  # irlData <- select(my_data16,positions)
-  # colnames(irlData)<-UsualColNames
-  # 
-  # # Differet column names used for Portugal - need to fix first before binding with the other data
-  # prtData <- select(my_data23,positions)
-  # colnames(prtData)<-UsualColNames
-  # 
-  # # Spain has some records with country as "ES" rather then "ESP" - fix this
-  # espData <- my_data26
-  # espData$`Table 5A: Quality assurance framework for biological data` <- as.character(espData$`Table 5A: Quality assurance framework for biological data`)
-  # espData$`Table 5A: Quality assurance framework for biological data`[espData$`Table 5A: Quality assurance framework for biological data`=='ES']<-"ESP"
-  # 
-  # # Stick all the data frames from each country together
-  # total_data <- bind_rows(
-  #   select(my_data5,positions),
-  #   select(my_data9,positions),
-  #   estData,# Differet column names used for Estonia
-  #   finData,# Differet column positions used for Finland
-  #   select(my_data12,positions),
-  #   select(my_data13,positions),
-  #   irlData, # Different column names for Ireland
-  #   select(my_data18,positions),
-  #   ltuData,# Differet column names used for Lithuania
-  #   select(my_data21,positions),
-  #   select(my_data22,positions),
-  #   prtData, # Differet column names used for Portugal
-  #   espData, # Some records have country as "ES" rather than "ESP" - this was fixed
-  #   select(my_data27,positions),
-  #   select(my_data28,positions)
-  # )
-  
-  
+
   # Stick all the data frames from each country together
   total_data <- bind_rows(
-    ReadIndicatorData(spreadsheetName,"Belgium"), #select(my_data5,positions),
-    ReadIndicatorData(spreadsheetName,"Denmark"), #select(my_data9,positions),
-    ReadIndicatorData(spreadsheetName,"Estonia"), #estData,# Differet column names used for Estonia
-    ReadIndicatorData(spreadsheetName,"Finland"), #finData,# Differet column positions used for Finland
-    ReadIndicatorData(spreadsheetName,"France"), #select(my_data12,positions),
-    ReadIndicatorData(spreadsheetName,"Germany"), #select(my_data13,positions),
-    ReadIndicatorData(spreadsheetName,"Ireland"), #irlData, # Different column names for Ireland
-    ReadIndicatorData(spreadsheetName,"Latvia"), #select(my_data18,positions),
-    ReadIndicatorData(spreadsheetName,"Lithuania"), #ltuData,# Differet column names used for Lithuania
-    ReadIndicatorData(spreadsheetName,"Netherlands"), #select(my_data21,positions),
-    ReadIndicatorData(spreadsheetName,"Poland"), #select(my_data22,positions),
-    ReadIndicatorData(spreadsheetName,"Portugal"), #prtData, # Differet column names used for Portugal
-    ReadIndicatorData(spreadsheetName,"Spain"), #espData, # Some records have country as "ES" rather than "ESP" - this was fixed
-    ReadIndicatorData(spreadsheetName,"Sweden"), #select(my_data27,positions),
-    ReadIndicatorData(spreadsheetName,"UK"), #select(my_data28,positions)
+    ReadIndicatorData(spreadsheetName,"Belgium"), 
+    ReadIndicatorData(spreadsheetName,"Denmark"),
+    ReadIndicatorData(spreadsheetName,"Estonia"), 
+    ReadIndicatorData(spreadsheetName,"Finland"), 
+    ReadIndicatorData(spreadsheetName,"France"), 
+    ReadIndicatorData(spreadsheetName,"Germany"),
+    ReadIndicatorData(spreadsheetName,"Ireland"), 
+    ReadIndicatorData(spreadsheetName,"Latvia"),
+    ReadIndicatorData(spreadsheetName,"Lithuania"), 
+    ReadIndicatorData(spreadsheetName,"Netherlands"), 
+    ReadIndicatorData(spreadsheetName,"Poland"),
+    ReadIndicatorData(spreadsheetName,"Portugal"), 
+    ReadIndicatorData(spreadsheetName,"Spain"), 
+    ReadIndicatorData(spreadsheetName,"Sweden"), 
+    ReadIndicatorData(spreadsheetName,"UK"), 
   )
   
   
   #View(total_data)
-  #colnames(total_data)=c("MS","SamplingDesign","NonResponses","DataCapture","DataStorage","AccuracyBias","EditImpute")
+
   colnames(total_data)=c("MS","SchemeName", "SamplingDesign","NonResponses","DataCapture","DataStorage","AccuracyBias","EditImpute","BS","NA","NSEA","LP","LDF","Rec.","Diad.")
   
-
   # Remove the rows we don't want e.g. the column headings and any extra blank rows
   final_data <- total_data[!is.na(total_data$MS),]
   final_data <- final_data [final_data$MS!="MS participating in sampling",]
