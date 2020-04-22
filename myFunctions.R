@@ -25,7 +25,7 @@ MyPlot <- function(to_plot, title, include_legend=TRUE){
   }
 }
 
-ReadIndicatorData <- function(spreadsheetName, countryName){
+ReadIndicatorData <- function(spreadsheetName, countryName, yearCalculated){
   
   #countryName <- 'Spain'
   #spreadsheetName <- 'Table5A_withIndicators_2020.xlsx'
@@ -94,6 +94,28 @@ ReadIndicatorData <- function(spreadsheetName, countryName){
     
   }
   
+  colnames(my_data)=c("MS","SchemeName", "SamplingDesign","NonResponses","DataCapture","DataStorage","AccuracyBias","EditImpute","BS","NA","NSEA","LP","LDF","Rec.","Diad.")
+  
+  # Remove the rows we don't want e.g. the column headings and any extra blank rows
+  my_data <- my_data[!is.na(my_data$MS),]
+  my_data <- my_data [my_data$MS!="MS participating in sampling",]
+  my_data <- my_data [my_data$MS!="MS",]
+  
+  # Add in the year we calcuated these indicators
+  my_data$YearCalculated <- yearCalculated
+  
+  # get rid of any columns we don't want and put the year as the first column
+  my_data <- my_data[,c("YearCalculated","MS","SchemeName", "SamplingDesign","NonResponses","DataCapture","DataStorage","AccuracyBias","EditImpute","BS","NA","NSEA","LP","LDF","Rec.","Diad.")]
+  
+  # Convert factors to numbers
+  # Introduces NAs for things that aren't numbers e.g. "?"
+  my_data$SamplingDesign <- as.numeric(as.character(my_data$SamplingDesign))
+  my_data$NonResponses <- as.numeric(as.character(my_data$NonResponses))
+  my_data$DataCapture <- as.numeric(as.character(my_data$DataCapture))
+  my_data$DataStorage <- as.numeric(as.character(my_data$DataStorage))
+  my_data$AccuracyBias <- as.numeric(as.character(my_data$AccuracyBias))
+  my_data$EditImpute <- as.numeric(as.character(my_data$EditImpute))
+  
   my_data
   
 }
@@ -105,51 +127,53 @@ readAndCleanData <- function(spreadsheetName, yearCalculated){
 
   # Stick all the data frames from each country together
   total_data <- bind_rows(
-    ReadIndicatorData(spreadsheetName,"Belgium"), 
-    ReadIndicatorData(spreadsheetName,"Denmark"),
-    ReadIndicatorData(spreadsheetName,"Estonia"), 
-    ReadIndicatorData(spreadsheetName,"Finland"), 
-    ReadIndicatorData(spreadsheetName,"France"), 
-    ReadIndicatorData(spreadsheetName,"Germany"),
-    ReadIndicatorData(spreadsheetName,"Ireland"), 
-    ReadIndicatorData(spreadsheetName,"Latvia"),
-    ReadIndicatorData(spreadsheetName,"Lithuania"), 
-    ReadIndicatorData(spreadsheetName,"Netherlands"), 
-    ReadIndicatorData(spreadsheetName,"Poland"),
-    ReadIndicatorData(spreadsheetName,"Portugal"), 
-    ReadIndicatorData(spreadsheetName,"Spain"), 
-    ReadIndicatorData(spreadsheetName,"Sweden"), 
-    ReadIndicatorData(spreadsheetName,"UK"), 
+    ReadIndicatorData(spreadsheetName,"Belgium", yearCalculated), 
+    ReadIndicatorData(spreadsheetName,"Denmark", yearCalculated),
+    ReadIndicatorData(spreadsheetName,"Estonia", yearCalculated), 
+    ReadIndicatorData(spreadsheetName,"Finland", yearCalculated), 
+    ReadIndicatorData(spreadsheetName,"France", yearCalculated), 
+    ReadIndicatorData(spreadsheetName,"Germany", yearCalculated),
+    ReadIndicatorData(spreadsheetName,"Ireland", yearCalculated), 
+    ReadIndicatorData(spreadsheetName,"Latvia", yearCalculated),
+    ReadIndicatorData(spreadsheetName,"Lithuania", yearCalculated), 
+    ReadIndicatorData(spreadsheetName,"Netherlands", yearCalculated), 
+    ReadIndicatorData(spreadsheetName,"Poland", yearCalculated),
+    ReadIndicatorData(spreadsheetName,"Portugal", yearCalculated), 
+    ReadIndicatorData(spreadsheetName,"Spain", yearCalculated), 
+    ReadIndicatorData(spreadsheetName,"Sweden", yearCalculated), 
+    ReadIndicatorData(spreadsheetName,"UK", yearCalculated) 
   )
   
   
   #View(total_data)
 
-  colnames(total_data)=c("MS","SchemeName", "SamplingDesign","NonResponses","DataCapture","DataStorage","AccuracyBias","EditImpute","BS","NA","NSEA","LP","LDF","Rec.","Diad.")
+  #colnames(total_data)=c("MS","SchemeName", "SamplingDesign","NonResponses","DataCapture","DataStorage","AccuracyBias","EditImpute","BS","NA","NSEA","LP","LDF","Rec.","Diad.")
   
   # Remove the rows we don't want e.g. the column headings and any extra blank rows
-  final_data <- total_data[!is.na(total_data$MS),]
-  final_data <- final_data [final_data$MS!="MS participating in sampling",]
-  final_data <- final_data [final_data$MS!="MS",]
+  #final_data <- total_data[!is.na(total_data$MS),]
+  #final_data <- final_data [final_data$MS!="MS participating in sampling",]
+  #final_data <- final_data [final_data$MS!="MS",]
   
   # Add in the year we calcuated these indicators
-  final_data$YearCalculated <- yearCalculated
+  #final_data$YearCalculated <- yearCalculated
   
   # get rid of any columns we don't want and put the year as the first column
-  final_data <- final_data[,c("YearCalculated","MS","SchemeName", "SamplingDesign","NonResponses","DataCapture","DataStorage","AccuracyBias","EditImpute","BS","NA","NSEA","LP","LDF","Rec.","Diad.")]
+  #final_data <- final_data[,c("YearCalculated","MS","SchemeName", "SamplingDesign","NonResponses","DataCapture","DataStorage","AccuracyBias","EditImpute","BS","NA","NSEA","LP","LDF","Rec.","Diad.")]
   
   #View(final_data)
   
   # Convert factors to numbers
   # Introduces NAs for things that aren't numbers e.g. "?"
-  final_data$SamplingDesign <- as.numeric(as.character(final_data$SamplingDesign))
-  final_data$NonResponses <- as.numeric(as.character(final_data$NonResponses))
-  final_data$DataCapture <- as.numeric(as.character(final_data$DataCapture))
-  final_data$DataStorage <- as.numeric(as.character(final_data$DataStorage))
-  final_data$AccuracyBias <- as.numeric(as.character(final_data$AccuracyBias))
-  final_data$EditImpute <- as.numeric(as.character(final_data$EditImpute))
+  #final_data$SamplingDesign <- as.numeric(as.character(final_data$SamplingDesign))
+  #final_data$NonResponses <- as.numeric(as.character(final_data$NonResponses))
+  #final_data$DataCapture <- as.numeric(as.character(final_data$DataCapture))
+  #final_data$DataStorage <- as.numeric(as.character(final_data$DataStorage))
+  #final_data$AccuracyBias <- as.numeric(as.character(final_data$AccuracyBias))
+  #final_data$EditImpute <- as.numeric(as.character(final_data$EditImpute))
   
-  final_data
+  #final_data
+  
+  total_data
   
 }
 
@@ -167,6 +191,11 @@ readBlindEvaluations <- function(spreadsheetName, yearCalculated){
       if (mySheet == paste(otherSheet, "_2", sep ="")){
         print(mySheet)
         print(otherSheet)
+        
+        mydata1 <- ReadIndicatorData(spreadsheetName, mySheet,yearCalculated )
+        mydata2 <- ReadIndicatorData(spreadsheetName, otherSheet,yearCalculated )
+        
+
         
       }
       
