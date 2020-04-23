@@ -93,7 +93,7 @@ MeanTotal <- rBindRetainRownames(list(a=MeanTotal_2019, b=MeanTotal_2020))
 # Plot the data
 # Used this order for columns so that the indicators will read in a clockwise direction
 data_to_plot<-MeanTotal[,c(1,6:2)]
-MyPlot(to_plot=data_to_plot,title="Overall mean for all MS")
+MyRadarPlot(to_plot=data_to_plot,title="Overall mean for all MS")
 
 options(knitr.kable.NA = 'NA')
 #kable(MeanTotal[,],caption = "Mean for all MS")
@@ -134,7 +134,7 @@ for(MSname in unique(MeanByMS$MS)){
   rownames(data_to_plot) <- data_to_plot$YearCalculated
   data_to_plot<-data_to_plot[,c("SamplingDesign","EditImpute","AccuracyBias","DataStorage","DataCapture","NonResponse")]
   
-  MyPlot(to_plot=data_to_plot,title=MSname, include_legend = TRUE)
+  MyRadarPlot(to_plot=data_to_plot,title=MSname, include_legend = TRUE)
 }
 
 par(op)
@@ -167,7 +167,7 @@ for(regionName in unique(MeanByRegion$Region)){
   rownames(data_to_plot) <- data_to_plot$YearCalculated
   data_to_plot<-data_to_plot[,c("SamplingDesign","EditImpute","AccuracyBias","DataStorage","DataCapture","NonResponse")]
   
-  MyPlot(to_plot=data_to_plot,title=regionName, include_legend = TRUE)
+  MyRadarPlot(to_plot=data_to_plot,title=regionName, include_legend = TRUE)
 }
 
 par(op)
@@ -185,18 +185,32 @@ kable(round(MeanByRegion[,c("SamplingDesign","NonResponse","DataCapture","DataSt
 ## Appendix 1: Data Checks
 
 The following tables check for the following potential errors:
-1) Rows which include values other than "1","2","3" or "4" for their indicators.
+1) Blind second evaluations which were perfomed in 2020 to check consistency.
 2) LDF, LP, Rec. or Diad. rows which also have other regions marked
+3) Rows which include values other than "1","2","3" or "4" for their indicators.
+
 
 ```{r step_show_problems, echo=FALSE}
 
-kable(check1234(final_data_2019),caption = '2019 entries which do not have a value of 1,2,3, or 4 for the indicators')
 
-kable(check1234(final_data_2020),caption = '2020 entries which do not have a value of 1,2,3, or 4 for the indicators')
+blindResults <- readBlindEvaluations(spreadsheetName = 'Table5A_withIndicators_2020.xlsx',yearCalculated = 2020)
+
+for(myListEntry in names(blindResults)){
+  #print(myListEntry)
+  myData <- blindResults[[myListEntry]]
+  #print(myDifferencesBoxPlot(dataToPlot = myData, title = myListEntry ))
+  p <-myDifferencesBoxPlot(dataToPlot = myData, title = myListEntry )
+  print(p)
+}
+
 
 kable(checkRegions(final_data_2019),caption = '2019 LDF, LP, Rec. or Diad. entries which also have other regions marked')
 
 kable(checkRegions(final_data_2020),caption = '2020 LDF, LP, Rec. or Diad. entries which also have other regions marked')
+
+kable(check1234(final_data_2019),caption = '2019 entries which do not have a value of 1,2,3, or 4 for the indicators')
+
+kable(check1234(final_data_2020),caption = '2020 entries which do not have a value of 1,2,3, or 4 for the indicators')
 
 ```
 

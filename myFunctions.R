@@ -1,6 +1,7 @@
 library(readxl)
 library(dplyr)
-library(fmsb)
+library(ggplot2)
+#library(fmsb)
 
 # Takes a list of data framees and rbinds them together whilst preserving the original rownames
 rBindRetainRownames <- function(listToMerge){
@@ -11,7 +12,7 @@ rBindRetainRownames <- function(listToMerge){
 }
 
 # User function to create a radar plot
-MyPlot <- function(to_plot, title, include_legend=TRUE){
+MyRadarPlot <- function(to_plot, title, include_legend=TRUE){
   
   to_plot=rbind(rep(4,nrow(to_plot)) , rep(0,nrow(to_plot)) , to_plot[,])
   
@@ -23,6 +24,23 @@ MyPlot <- function(to_plot, title, include_legend=TRUE){
     #legend(1.4,1,legend = rownames(to_plot[-c(1,2),]), pch=20, col=colors_border,cex=0.5, pt.cex=2)
     legend(1.4,0.25,legend = rownames(to_plot[-c(1,2),]), pch=20, col=colors_border,cex=0.5, pt.cex=2)
   }
+}
+
+# Create a boxplot of the differneces in indicator values
+myDifferencesBoxPlot <-function(dataToPlot, title){
+  
+  #dataToPlot <- myValue
+  #title <- "test"
+
+  p <- ggplot(dataToPlot, aes(x=dataToPlot$Variable, y=dataToPlot$ValueDifference)) + 
+    geom_boxplot(fill="slateblue", alpha=0.2) + 
+    #geom_jitter(color="black", size=0.4, alpha=0.9) +
+    ggtitle(title) +
+    xlab("Indicator") +
+    theme(axis.text.x=element_text(angle = -90)) +
+    scale_y_continuous(name="Difference in values", limits=c(-4, 4),breaks=seq(-4,4,1))
+  
+  p
 }
 
 ReadIndicatorData <- function(spreadsheetName, countryName, yearCalculated){
@@ -145,63 +163,76 @@ readAndCleanData <- function(spreadsheetName, yearCalculated){
   )
   
   
-  #View(total_data)
-
-  #colnames(total_data)=c("MS","SchemeName", "SamplingDesign","NonResponses","DataCapture","DataStorage","AccuracyBias","EditImpute","BS","NA","NSEA","LP","LDF","Rec.","Diad.")
-  
-  # Remove the rows we don't want e.g. the column headings and any extra blank rows
-  #final_data <- total_data[!is.na(total_data$MS),]
-  #final_data <- final_data [final_data$MS!="MS participating in sampling",]
-  #final_data <- final_data [final_data$MS!="MS",]
-  
-  # Add in the year we calcuated these indicators
-  #final_data$YearCalculated <- yearCalculated
-  
-  # get rid of any columns we don't want and put the year as the first column
-  #final_data <- final_data[,c("YearCalculated","MS","SchemeName", "SamplingDesign","NonResponses","DataCapture","DataStorage","AccuracyBias","EditImpute","BS","NA","NSEA","LP","LDF","Rec.","Diad.")]
-  
-  #View(final_data)
-  
-  # Convert factors to numbers
-  # Introduces NAs for things that aren't numbers e.g. "?"
-  #final_data$SamplingDesign <- as.numeric(as.character(final_data$SamplingDesign))
-  #final_data$NonResponses <- as.numeric(as.character(final_data$NonResponses))
-  #final_data$DataCapture <- as.numeric(as.character(final_data$DataCapture))
-  #final_data$DataStorage <- as.numeric(as.character(final_data$DataStorage))
-  #final_data$AccuracyBias <- as.numeric(as.character(final_data$AccuracyBias))
-  #final_data$EditImpute <- as.numeric(as.character(final_data$EditImpute))
-  
-  #final_data
-  
   total_data
   
 }
 
+# Read through a spreadsheet, find any sheets which have related names (i.e. "Spain" and "Spain_2")
 readBlindEvaluations <- function(spreadsheetName, yearCalculated){
   
   #spreadsheetName <- 'Table5A_withIndicators_2020.xlsx'
   #yearCalculated <- 2020
   
+  myResult <- list()
+  
   sheetNames <- excel_sheets(spreadsheetName)
   
+  # Probably a better vectorised way to do this but loops are quick enough for what we need
   for (mySheet in sheetNames){
-
-    
     for (otherSheet in sheetNames){
-      if (mySheet == paste(otherSheet, "_2", sep ="")){
-        print(mySheet)
-        print(otherSheet)
+      #if (mySheet == paste(otherSheet, "_2", sep ="")){
+      if (grepl(mySheet, otherSheet, fixed=TRUE) & mySheet != otherSheet){
         
-        mydata1 <- ReadIndicatorData(spreadsheetName, mySheet,yearCalculated )
-        mydata2 <- ReadIndicatorData(spreadsheetName, otherSheet,yearCalculated )
+        #mySheet <- "Spain"
+        #otherSheet <- "Spain_2"
+        
+        #print(mySheet)
+        #print(otherSheet)
         
 
+        mySheetData <- ReadIndicatorData(spreadsheetName, mySheet,yearCalculated )
+        otherSheetData <- ReadIndicatorData(spreadsheetName, otherSheet,yearCalculated )
+        # Merge our sets of data
+        #mergedData <- merge(mySheetData,otherSheetData, by = c("YearCalculated", "MS", "SchemeName") )
+        # Merge by row names because there can be soem dulicate years/scheme name combinations
+        mergedData <- merge(mySheetData,otherSheetData, by =0 )
+        
+        # Calculate the differences
+        mergedData$SamplingDesign.Diff <- mergedData$SamplingDesign.y - mergedData$SamplingDesign.x
+        mergedData$NonResponses.Diff <- mergedData$NonResponses.y - mergedData$NonResponses.x
+        mergedData$DataCapture.Diff <- mergedData$DataCapture.y - mergedData$DataCapture.x
+        mergedData$DataStorage.Diff <- mergedData$DataStorage.y - mergedData$DataStorage.x
+        mergedData$AccuracyBias.Diff <- mergedData$AccuracyBias.y - mergedData$AccuracyBias.x
+        mergedData$EditImpute.Diff <- mergedData$EditImpute.y - mergedData$EditImpute.x
+        
+        # Stick all the differeneces together
+        finalData <- bind_rows(
+          data.frame(Variable=as.character("SamplingDesign"), ValueDifference = mergedData$SamplingDesign.Diff, stringsAsFactors=FALSE),
+          data.frame(Variable=as.character("NonResponses"), ValueDifference = mergedData$NonResponses.Diff, stringsAsFactors=FALSE),
+          data.frame(Variable=as.character("DataCapture"), ValueDifference = mergedData$DataCapture.Diff, stringsAsFactors=FALSE),
+          data.frame(Variable=as.character("DataStorage"), ValueDifference = mergedData$DataStorage.Diff, stringsAsFactors=FALSE),
+          data.frame(Variable=as.character("AccuracyBias"), ValueDifference = mergedData$AccuracyBias.Diff, stringsAsFactors=FALSE),
+          data.frame(Variable=as.character("EditImpute"), ValueDifference = mergedData$EditImpute.Diff, stringsAsFactors=FALSE)
+          
+        )
+
+        # Change variable to a factor
+        finalData$Variable <- factor(finalData$Variable, levels = c("SamplingDesign","NonResponses", "DataCapture", "DataStorage","AccuracyBias","EditImpute" ))
+        
+        # Date for this comparison
+        #finalData
+        
+        # Add it in to the results to return
+        myResult[[paste(mySheet,yearCalculated,sep="-")]]<- finalData
+        
         
       }
-      
     }
-    
   }
+  
+  # Final result to return
+  myResult
+  
 }
 
 # Read the indicator definitions from a spreadsheet
