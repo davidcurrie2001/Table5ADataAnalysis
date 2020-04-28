@@ -1,10 +1,10 @@
 ---
 title: "Data Quality RCG Sub-Group Task 1 and 2"
 output:
+  word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
-  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -141,7 +141,7 @@ par(op)
 
 options(knitr.kable.NA = 'NA')
 #kable(MeanByMS[,],caption = "Mean by Member State")
-kable(round(MeanByMS[,c("SamplingDesign","NonResponse","DataCapture","DataStorage","AccuracyBias","EditImpute")],digits=2),caption = "Mean by Member State")
+kable(round(MeanByMS[order(row.names(MeanByMS)),c("SamplingDesign","NonResponse","DataCapture","DataStorage","AccuracyBias","EditImpute")],digits=2),caption = "Mean by Member State")
 
 ```
 
@@ -175,7 +175,7 @@ par(op)
 
 #rownames(regionalSummary) <- colnames(final_data_2019)[c(10,11,12,13,14,15,16)]
 #kable(regionalSummary,caption = "Regional Summary")
-kable(round(MeanByRegion[,c("SamplingDesign","NonResponse","DataCapture","DataStorage","AccuracyBias","EditImpute")],digits=2),caption = "Regional Summary")
+kable(round(MeanByRegion[order(row.names(MeanByRegion)),c("SamplingDesign","NonResponse","DataCapture","DataStorage","AccuracyBias","EditImpute")],digits=2),caption = "Regional Summary")
 
 
 ```

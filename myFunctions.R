@@ -22,7 +22,7 @@ MyRadarPlot <- function(to_plot, title, include_legend=TRUE){
   
   if (include_legend) {
     #legend(1.4,1,legend = rownames(to_plot[-c(1,2),]), pch=20, col=colors_border,cex=0.5, pt.cex=2)
-    legend(1.4,0.25,legend = rownames(to_plot[-c(1,2),]), pch=20, col=colors_border,cex=0.5, pt.cex=2)
+    legend(0.9,0.25,legend = rownames(to_plot[-c(1,2),]), pch=20, col=colors_border,cex=0.5, pt.cex=2)
   }
 }
 

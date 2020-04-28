@@ -40,3 +40,4 @@ vignettes/*.pdf
 
 # Markdown output
 *.html
+*.docx
