@@ -1,10 +1,10 @@
 ---
 title: "Data Quality RCG Sub-Group Task 1 and 2"
 output:
-  word_document: default
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -92,11 +92,10 @@ MeanTotal <- rBindRetainRownames(list(a=MeanTotal_2019, b=MeanTotal_2020))
 
 # Plot the data
 # Used this order for columns so that the indicators will read in a clockwise direction
-data_to_plot<-MeanTotal[,c(1,6:2)]
+data_to_plot<-MeanTotal[,c(2,7:3)]
 MyRadarPlot(to_plot=data_to_plot,title="Overall mean for all countries")
 
 options(knitr.kable.NA = 'NA')
-#kable(MeanTotal[,],caption = "Mean for all MS")
 kable(round(MeanTotal[,],digits=2),caption = "Mean for all countries")
 
 
@@ -140,8 +139,7 @@ for(MSname in unique(MeanByMS$MS)){
 par(op)
 
 options(knitr.kable.NA = 'NA')
-#kable(MeanByMS[,],caption = "Mean by Member State")
-kable(round(MeanByMS[order(row.names(MeanByMS)),c("SamplingDesign","NonResponse","DataCapture","DataStorage","AccuracyBias","EditImpute")],digits=2),caption = "Mean by Member State")
+kable(round(MeanByMS[order(row.names(MeanByMS)),c("NumberOfRows", "SamplingDesign","NonResponse","DataCapture","DataStorage","AccuracyBias","EditImpute")],digits=2),caption = "Mean by Member State")
 
 ```
 
@@ -173,9 +171,7 @@ for(regionName in unique(MeanByRegion$Region)){
 par(op)
 
 
-#rownames(regionalSummary) <- colnames(final_data_2019)[c(10,11,12,13,14,15,16)]
-#kable(regionalSummary,caption = "Regional Summary")
-kable(round(MeanByRegion[order(row.names(MeanByRegion)),c("SamplingDesign","NonResponse","DataCapture","DataStorage","AccuracyBias","EditImpute")],digits=2),caption = "Regional Summary")
+kable(round(MeanByRegion[order(row.names(MeanByRegion)),c("NumberOfRows", "SamplingDesign","NonResponse","DataCapture","DataStorage","AccuracyBias","EditImpute")],digits=2),caption = "Regional Summary")
 
 
 ```

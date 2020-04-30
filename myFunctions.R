@@ -253,7 +253,7 @@ calculateMeanForAllMS <- function(dataToUse){
   
   #dataToUse <- final_data
   
-  MeanTotal <- data.frame(SamplingDesign=mean(dataToUse$SamplingDesign,na.rm = TRUE), NonResponse=mean(dataToUse$NonResponses,na.rm = TRUE), DataCapture=mean(dataToUse$DataCapture,na.rm = TRUE), DataStorage=mean(dataToUse$DataStorage,na.rm = TRUE), AccuracyBias=mean(dataToUse$AccuracyBias,na.rm = TRUE), EditImpute=mean(dataToUse$EditImpute,na.rm = TRUE))
+  MeanTotal <- data.frame(NumberOfRows=nrow(dataToUse), SamplingDesign=mean(dataToUse$SamplingDesign,na.rm = TRUE), NonResponse=mean(dataToUse$NonResponses,na.rm = TRUE), DataCapture=mean(dataToUse$DataCapture,na.rm = TRUE), DataStorage=mean(dataToUse$DataStorage,na.rm = TRUE), AccuracyBias=mean(dataToUse$AccuracyBias,na.rm = TRUE), EditImpute=mean(dataToUse$EditImpute,na.rm = TRUE))
   #View(MeanTotal)
   #dataToUse$YearCalculated[1]
   
