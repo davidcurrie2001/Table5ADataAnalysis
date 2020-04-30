@@ -93,11 +93,11 @@ MeanTotal <- rBindRetainRownames(list(a=MeanTotal_2019, b=MeanTotal_2020))
 # Plot the data
 # Used this order for columns so that the indicators will read in a clockwise direction
 data_to_plot<-MeanTotal[,c(1,6:2)]
-MyRadarPlot(to_plot=data_to_plot,title="Overall mean for all MS")
+MyRadarPlot(to_plot=data_to_plot,title="Overall mean for all countries")
 
 options(knitr.kable.NA = 'NA')
 #kable(MeanTotal[,],caption = "Mean for all MS")
-kable(round(MeanTotal[,],digits=2),caption = "Mean for all MS")
+kable(round(MeanTotal[,],digits=2),caption = "Mean for all countries")
 
 
 ```
