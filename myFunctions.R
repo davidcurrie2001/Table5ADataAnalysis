@@ -134,6 +134,17 @@ ReadIndicatorData <- function(spreadsheetName, countryName, yearCalculated){
   my_data$AccuracyBias <- as.numeric(as.character(my_data$AccuracyBias))
   my_data$EditImpute <- as.numeric(as.character(my_data$EditImpute))
   
+  # Change all regional markers to upper case (x to X)
+  my_data$BS <- toupper(my_data$BS)
+  # Need to use different notation because I have stupidly called the column "NA"
+  my_data[,"NA"] <- toupper(my_data[["NA"]])
+  my_data$NSEA <- toupper(my_data$NSEA)
+  my_data$LP <- toupper(my_data$LP)
+  my_data$LDF <- toupper(my_data$LDF)
+  my_data$Rec. <- toupper(my_data$Rec.)
+  my_data$Diad. <- toupper(my_data$Diad.)
+  
+  
   my_data
   
 }
@@ -308,7 +319,7 @@ calculateMeanByRegion <- function(dataToUse){
     # Remove the rows which don't apply to the current region
     regionalData <- subset(dataToUse, !is.na(dataToUse[myColNumber]))
     regionalData <- regionalData[regionalData[myColNumber]=="X",]
-    
+
     # Get the mean values for the current region
     regionalMean <- data.frame(YearCalculated = regionalData$YearCalculated[1], Region=regionName, NumberOfRows=nrow(regionalData), SamplingDesign=mean(regionalData$SamplingDesign,na.rm = TRUE), NonResponse=mean(regionalData$NonResponses,na.rm = TRUE), DataCapture=mean(regionalData$DataCapture,na.rm = TRUE), DataStorage=mean(regionalData$DataStorage,na.rm = TRUE), AccuracyBias=mean(regionalData$AccuracyBias,na.rm = TRUE), EditImpute=mean(regionalData$EditImpute,na.rm = TRUE))
     
@@ -341,17 +352,18 @@ check1234<-function(dataToCheck){
 #  Check whether rows with LDF, LP, Rec. or Diad. regions also have other regions  marked
 checkRegions <- function(dataToCheck){
   
-  #dataToCheck <- final_data_2019
-  
   dataToCheck$NumberOfRegions <- ifelse(!is.na(dataToCheck[["BS"]]),1,0) + ifelse(!is.na(dataToCheck[["NA"]]),1,0)  + ifelse(!is.na(dataToCheck[["NSEA"]]),1,0)  + ifelse(!is.na(dataToCheck[["LP"]]),1,0)  + ifelse(!is.na(dataToCheck[["LDF"]]),1,0)  + ifelse(!is.na(dataToCheck[["Rec."]]),1,0)  + ifelse(!is.na(dataToCheck[["Diad."]]),1,0)
 
+  
+  
   # Check whether LDF, LP, Rec. or Diad. have other regions also marked
   errorsLDF <- dataToCheck[!is.na(dataToCheck$LDF) & dataToCheck$NumberOfRegions>1,]
   errorsLP <- dataToCheck[!is.na(dataToCheck$LP) & dataToCheck$NumberOfRegions>1,]
   errorsRec <- dataToCheck[!is.na(dataToCheck$Rec.) & dataToCheck$NumberOfRegions>1,]
   errorsDiad <-dataToCheck[!is.na(dataToCheck$Diad.) & dataToCheck$NumberOfRegions>1,]
+  errorsNoRegions <- dataToCheck[dataToCheck$NumberOfRegions == 0,]
 
-  errorsToReturn <- rBindRetainRownames(list(a=errorsLDF, b=errorsLP, c=errorsRec, d=errorsDiad ))
+  errorsToReturn <- rBindRetainRownames(list(a=errorsLDF, b=errorsLP, c=errorsRec, d=errorsDiad, e=errorsNoRegions ))
   
   errorsToReturn
   
